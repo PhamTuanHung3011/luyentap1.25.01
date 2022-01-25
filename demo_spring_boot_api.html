@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>
+
+</head>
+<body>
+
+<div class="container">
+    <h2>Show User</h2>
+
+    <br>
+    <br>
+    <div>
+        <form action="/find" method="get">
+            <input type="text" class="form-control" placeholder="search" name="name" id="findName" >
+            <button type="submit" class="btn btn-success" oninput="search()">Find</button>
+        </form>
+    </div>
+
+    <br>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>NameUser</th>
+            <th>Password</th>
+            <th>PhoneNumber</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Avatar</th>
+            <th colspan="2" style="text-align: center">Action</th>
+
+        </tr>
+        </thead>
+        <tbody id="tbody1">
+
+        </tbody>
+    </table>
+    <br>
+
+</div>
+
+<!--modal create-->
+<div class="container">
+    <!-- Trigger the modal with a button -->
+    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Create Staff</button>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Creat Staff Table</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="nameUser">User name:</label>
+                        <input type="text" class="form-control" id="nameUser">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="text" class="form-control" id="password">
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number:</label>
+                        <input type="text" class="form-control" id="phoneNumber">
+                    </div>
+                    <div class="form-group">
+                        <label >Email:</label>
+                        <input type="text" class="form-control" id="email">
+                    </div>
+                    <div class="form-group">
+                        <label >Img Staff:</label>
+                        <progress value="0" max="100" id="uploader">0%</progress>
+                        <input type="file" value="upload" accept=".jpg" id="fileButton">
+                    </div>
+                    <div class="form-group">
+                        <label>Branch:</label>
+                        <select id="idRole">
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="create()" data-dismiss="modal">Save</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!--modal edit-->
+<div class="container">
+    <!-- Trigger the modal with a button -->
+    <!--    <button type="button" class="btn btn-warning btn-lg" data-toggle="modal" data-target="#myModalEdit">Edit </button>-->
+    <!-- Modal -->
+    <div class="modal fade" id="myModalEdit" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Edit User Table</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Id User:</label>
+                        <p type="text" class="form-control" id="idUserEdit"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>User Name:</label>
+                        <input type="text" class="form-control" id="nameUserEdit">
+                    </div>
+
+                    <div class="form-group">
+                        <label >Password:</label>
+                        <input type="text" class="form-control" id="passwordEdit" >
+                    </div>
+
+                    <div class="form-group">
+                        <label >Phone number:</label>
+                        <input type="text" class="form-control" id="phoneNumberEdit" >
+                    </div>
+
+                    <div class="form-group">
+                        <label >Email:</label>
+                        <input type="text" class="form-control" id="emailEdit" >
+                    </div>
+
+                    <div class="form-group">
+                        <label id="imgOld">Img Staff:</label>
+                        <input src="${staff.imgStaff}" type="text" class="form-control" id="imgStaffEdit" >
+                        <input type="file" value="upload" accept=".jpg" id="fileButton">
+                    </div>
+                    <div class="form-group">
+                        <label>Branch:</label>
+                        <select id="idRoleEdit">
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveEdit()" data-dismiss="modal">Edit</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!--modal delete-->
+<div class="container">
+
+    <div class="modal fade" id="myModalDelete" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Delete Staff Table</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="idStaffDelete">Id Staff:</label>
+                        <input type="text" class="form-control" id="idStaffDelete">
+                    </div>
+                    <div class="form-group">
+                        <label for="codeStaffDelete">Code Staff:</label>
+                        <input type="text" class="form-control" id="codeStaffDelete" >
+                    </div>
+                    <div class="form-group">
+                        <label for="nameStaffDelete">Name Staff:</label>
+                        <input type="text" class="form-control" id="nameStaffDelete" >
+                    </div>
+                    <div class="form-group">
+                        <label for="ageStaffDelete">Age Staff:</label>
+                        <input type="text" class="form-control" id="ageStaffDelete" >
+                    </div><div class="form-group">
+                    <label for="salaryStaffDelete">Salary:</label>
+                    <input type="text" class="form-control" id="salaryStaffDelete" >
+                </div>
+                    <div class="form-group">
+                        <label for="imgStaffDelete">Img Staff:</label>
+                        <input type="text" class="form-control" id="imgStaffDelete" >
+
+                    </div>
+                    <div class="form-group">
+                        <label for="idBranchDelete">id_Branch:</label>
+                        <input type="text" class="form-control" id="idBranchDelete" >
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="deleteStaff()" data-dismiss="modal">Delete</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+
+<script>
+
+    //BE SURE TO PROTECT EVERYTHING IN THE CONFIG
+    //DON'T COMMIT IT!!!
+
+    // Initialize Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyDvpkYL9PSaYsyZaLKloBjkvguFGi7aVYw",
+        authDomain: "storemedia-e9cd7.firebaseapp.com",
+        projectId: "storemedia-e9cd7",
+        storageBucket: "storemedia-e9cd7.appspot.com",
+        messagingSenderId: "815538751864",
+        appId: "1:815538751864:web:8fec6ce43d238664ece08d",
+        measurementId: "G-WWQ895VFTN"
+    };
+    firebase.initializeApp(firebaseConfig);
+</script>
+
+<script type="text/javascript">
+    let imageUp = '';
+    // firebase bucket name
+    // REPLACE WITH THE ONE YOU CREATE
+    // ALSO CHECK STORAGE RULES IN FIREBASE CONSOLE
+    var fbBucketName = 'images';
+
+    // get elements
+    var uploader = document.getElementById('uploader');
+    var fileButton = document.getElementById('fileButton');
+
+    // listen for file selection
+    fileButton.addEventListener('change', function (e) {
+
+        // what happened
+        console.log('file upload event', e);
+
+        // get file
+        var file = e.target.files[0];
+
+        // create a storage ref
+        var storageRef = firebase.storage().ref(`${fbBucketName}/${file.name}`);
+
+        // upload file
+        var uploadTask = storageRef.put(file);
+
+        // The part below is largely copy-pasted from the 'Full Example' section from
+        // https://firebase.google.com/docs/storage/web/upload-files
+
+        // update progress bar
+        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+            function (snapshot) {
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                uploader.value = progress;
+                console.log('Upload is ' + progress + '% done');
+                switch (snapshot.state) {
+                    case firebase.storage.TaskState.PAUSED: // or 'paused'
+                        console.log('Upload is paused');
+                        break;
+                    case firebase.storage.TaskState.RUNNING: // or 'running'
+                        console.log('Upload is running');
+                        break;
+                }
+            }, function (error) {
+
+                // A full list of error codes is available at
+                // https://firebase.google.com/docs/storage/web/handle-errors
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        // User doesn't have permission to access the object
+                        break;
+
+                    case 'storage/canceled':
+                        // User canceled the upload
+                        break;
+
+                    case 'storage/unknown':
+                        // Unknown error occurred, inspect error.serverResponse
+                        break;
+                }
+            }, function () {
+                // Upload completed successfully, now we can get the download URL
+                // save this link somewhere, e.g. put it in an input field
+                var downloadURL = uploadTask.snapshot.downloadURL;
+                imageUp = downloadURL;
+                console.log('downloadURL ===>', downloadURL);
+                let divLocation = document.getElementById("imgDiv");
+                let imgElement = document.createElement("img");
+                imgElement.src = downloadURL
+                console.log('pic ==', imageUp)
+                divLocation.append(imgElement);
+            });
+
+
+
+
+    });
+
+</script>
+<script>
+    let totalPages = 1;
+
+    function show(pageNumber) {
+        if (pageNumber < 0) {
+            pageNumber = 0;
+        }
+        if (pageNumber > totalPages - 1) {
+            pageNumber = totalPages - 1;
+        }
+        let url = `http://localhost:8080/api/user?page=${pageNumber}`;
+        $.ajax({
+            type: "GET",
+            url: url,
+            //xử lý khi thành công
+            success: function (data) {
+                console.log("gọi thành công và trả về :")
+                document.getElementById("tbody1").innerHTML = showData(data);
+                totalPages = data.totalPages;
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    }
+
+    function selectRole() {
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:8080/api/role",
+            success: function (data) {
+                let str = "";
+                for (let i = 0; i < data.length; i++) {
+                    str += `<option value="${data[i].idRole}">${data[i].nameRole}</option>`
+                }
+                document.getElementById("idRole").innerHTML = str;
+                document.getElementById("idBranchEdit").innerHTML = str;
+            },
+
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    }
+
+    selectRole();
+
+    function search() {
+        let name = document.getElementById("findName").value;
+        let url = `http://localhost:8080/find/${name}`;
+
+        $.ajax({
+            headers: {
+                'Accept': 'application/json'
+            },
+            type: "GET",
+            url: url,
+            //xử lý khi thành công
+            success: function (data) {
+                document.getElementById("tbody1").innerHTML = showData(data);
+                console.log(url);
+                console.log(data)
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    }
+
+    function create() {
+        let nameUser = document.getElementById("nameUser").value;
+        let password = document.getElementById("password").value;
+        let phoneNumber = document.getElementById("phoneNumber").value;
+        let email = document.getElementById("email").value;
+        let avatar = imageUp;
+        let idRole = document.getElementById("idRole").value;
+
+        let User = {
+            nameUser : nameUser,
+            password: password,
+            phoneNumber: phoneNumber,
+            email: email,
+            avatar: avatar,
+            role: {idRole: idRole}
+        }
+        $.ajax({
+            type: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            url: "http://localhost:8080/api/user",
+            data: JSON.stringify(User),
+            //xử lý khi thành công
+            success: function (data) {
+                show(0)
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    }
+
+    function showDelete(id) {
+
+        let url = `http://localhost:8080/delete/${id}`;
+        $.ajax({
+            headers: {
+                'Accept': 'application/json'
+            },
+            type: "GET",
+            url: url,
+            //xử lý khi thành công
+            success: function (data) {
+                console.log(data)
+                document.getElementById("idStaffDelete").value= data.idStaff;
+                document.getElementById("codeStaffDelete").value= data.codeStaff;
+                document.getElementById("nameStaffDelete").value= data.nameStaff;
+                document.getElementById("ageStaffDelete").value= data.ageStaff;
+                document.getElementById("salaryStaffDelete").value= data.salaryStaff;
+                document.getElementById("imgStaffDelete").value= data.imgStaff;
+                document.getElementById("idBranchDelete").value= data.branch.idBranch;
+
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    }
+
+    function deleteStaff() {
+        let id = document.getElementById("idStaffDelete").value;
+        let url = `http://localhost:8080/delete/${id}`;
+        $.ajax ({
+            // headers: {
+            //         'Accept': 'application/json',
+            // },
+            type: "DELETE",
+            url: url,
+            success: function (data) {
+                console.log("gọi thành công và trả về :")
+                show(0)
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    }
+
+    function showEdit(id) {
+        let url = `http://localhost:8080/api/user/${id}`;
+
+        $.ajax({
+            headers: {
+                'Accept': 'application/json'
+            },
+            type: "GET",
+            url: url,
+            //xử lý khi thành công
+            success: function (data) {
+                console.log(data)
+                document.getElementById("idUserEdit").value= data.idUser;
+                document.getElementById("nameUserEdit").value= data.nameUser;
+                document.getElementById("passwordEdit").value= data.password;
+                document.getElementById("phoneNumberEdit").value= data.phoneNumber;
+                document.getElementById("emailEdit").value= data.email;
+                document.getElementById("imgOldEdit").value= data.avatar;
+                document.getElementById("idRoleEdit").value= data.role.idRole;
+
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    }
+
+    function saveEdit() {
+        let staff = {
+            idStaff: document.getElementById("idStaffEdit").value,
+            codeStaff: document.getElementById("codeStaffEdit").value,
+            nameStaff: document.getElementById("nameStaffEdit").value,
+            ageStaff: document.getElementById("ageStaffEdit").value,
+            salaryStaff: document.getElementById("salaryStaffEdit").value,
+            imgStaff: document.getElementById("imgStaffEdit").value,
+            branch: {
+                idBranch:document.getElementById("idBranchEdit").value
+            }
+        }
+        let url = `http://localhost:8080/edit`;
+
+        $.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(staff),
+            type: "PUT",
+            url: url,
+            //xử lý khi thành công
+            success: function (data) {
+                alert("update thành công");
+                show(0);
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    }
+
+    function showDataEdit(User) {
+        return `<tr>
+
+            <td><input id="idUserEdit" value="${user.idUser}" readonly></td>
+            <td><input id="nameUserEdit" value="${user.nameUser}"></td>
+            <td><input id="passwordEdit" value="${user.password}"></td>
+            <td><input id="phoneNumberEdit" value="${user.phoneNumber}"></td>
+            <td><input id="emailEdit" value="${user.email}"></td>
+            <td><input id="imgOldEdit" value="${user.avatar}"></td>
+            <td><input id="idRoleEdit" value="${user.role.idRole}"></td>
+            </tr>
+            <button onclick="saveEdit()">Edit</button>
+
+`
+    }
+
+    // function edit(id){
+    //     window.localStorage.setItem("idStudent",id);
+    //     window.location.href="edit.html";
+    // }
+
+
+    function showData(pageable) {
+        let arrUser = pageable.content;
+        let str = "";
+
+        for (let i = 0; i < arrUser.length; i++) {
+            str += `<tr>
+            <td>${i + 1}</td>
+
+            <td>${arrUser[i].nameUser}</td>
+            <td>${arrUser[i].password}</td>
+            <td>${arrUser[i].phoneNumber}</td>
+            <td>${arrUser[i].email}</td>
+            <td>${arrUser[i].role.nameRole}</td>
+            <td><img src="${arrUser[i].avatar}" width="150" height="150"></td>
+
+             <td><button type="button" class="btn btn-warning btn-lg" data-toggle="modal" data-target="#myModalEdit" onclick="showEdit(${arrUser[i].idUser})">Edit Staff</button></td>
+             <td><button type="button" class="btn btn-warning btn-lg" data-toggle="modal" data-target="#myModalDelete" onclick="showDelete(${arrUser[i].idUser})">Delete Staff</button></td>
+
+            </tr>`
+
+        }
+        str += `<button onclick="show(${pageable.number - 1})">Back</button>
+                 <span>${pageable.number + 1}</span>/<span>${pageable.totalPages}</span>
+                 <button onclick="show(${pageable.number + 1})">Next</button>`
+        return str;
+    }
+
+    show(0);
+</script>
+</html>
